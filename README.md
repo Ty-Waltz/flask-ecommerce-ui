@@ -49,7 +49,7 @@ products stores the list of available products fetched from the API.
 -Quantity: Captures the order quantity with a number input. The minimum value is restricted to 1.  
 -Order Date: Uses a date picker to capture the order date.  
 -A button at the bottom submits the form, triggering handleSubmit.  
-### OrderHistory  
+### OrderHistory.jsx  
 -This file defines the OrderHistory component, which displays a customer's past orders.  
 -State management is handled by two hooks:  
   orders stores the list of orders retrieved from the API.  
@@ -62,10 +62,75 @@ products stores the list of available products fetched from the API.
   If the orders array is empty, a fallback message is displayed.  
   If there are no errors, the list of orders is rendered.  
 -The order list is displayed using a ListGroup from React Bootstrap.  
--Each order is mapped to a ListGroup.Item, which displays the order's:  
+-Each order is mapped to a ListGroup.Item, which displays the orders:  
   ID: The unique identifier for the order.  
   Date: Converted to a readable format using toLocaleDateString().  
   Total: The total cost of the order, formatted as a dollar amount.  
--A "View Order" button links to the order's detail page using the href attribute and the order's ID.  
+-A "View Order" button links to the order's detail page using the href attribute and the order's id.  
+### ProductDetails.jsx  
+-This file defines the ProductDetails component, which displays detailed information about a specific product.  
+=State management is handled by two hooks:  
+  product: Stores the product details retrieved from the API.  
+  error: Stores any error messages that may occur while fetching the product details.  
+-useEffect hook fetches product details when the productId prop changes. If productId is provided, an API request is made using axios.get() to fetch product details from the endpoint http://127.0.0.1:5000/products/${productId}.  
+On success, the product data is saved to the product state using setProduct().  
+On failure, the error state is updated with an appropriate error message, and the error is logged to the console.  
+Conditional rendering handles different states:  
+  If an error exists, an Alert with a "danger" is displayed, showing the error message.  
+  If product is null, a simple "Loading..." message is displayed.  
+-Once the product details are successfully fetched, they are displayed in the main content area.  
+-The component renders the product attributes:  
+  Name: Displayed as a bold label followed by the product's name.  
+  Price: Displayed in dollars, formatted as ${product.price}.  
+  Description: Shown under a bold "Description" label.  
+-A "Edit Product" button is provided, which links to the product editing page. The href is dynamically generated using the product ID.  
+### ProductForm.jsx  
+-This file defines the ProductForm component, which is used for adding or editing a product.  
+-It handles both form validation and submission using React hooks and integrates with a backend API through axios.  
+-State management is handled using React's useState hook:  
+  product: Holds the values for the product being added or edited (name, price, and description).  
+  errors: Stores any validation errors for the form fields (name, price, description).  
+  loading: Shows the loading state while the form is being submitted.  
+  errorMessage: Holds a general error message if something goes wrong during form submission.
+-useEffect hook fetches product data if productId is provided. When productId changes, an API call is made to fetch the product data from the backend using axios.get(). If the data is fetched successfully, it updates the product state. If there’s an error, an error message is set in the errorMessage state.
+-handleChange function updates the product state when a form field is modified. It uses the name and value properties from the event to dynamically update the appropriate field in the product object.  
+-validateForm function checks if all required fields are filled out correctly.  
+handleSubmit function handles form submission. It validates the form by calling validateForm(). If there are no validation errors, the form proceeds to submission. It determines whether to make a POST or PUT request based on whether a productId exists.  
+-The API request is made using axios.post() or axios.put(), and upon successful submission, the onProductSaved callback is called.  
+-Conditional rendering is used to handle different states:
+  If there’s an error message, it is displayed as an alert at the top of the form.
+  If the form is being submitted, the "Save" button displays a "Saving..." text and is disabled to prevent multiple submissions.
+-The form fields are rendered using Form.Control from React Bootstrap. If a field has an error, the input is marked as invalid, and the error message is displayed below the field using Form.Control.Feedback.
+-onProductSaved: A callback function that is called when the product is successfully saved.
+### ProductList.jsx  
+-This file is used to display a list of products associated with a specific order.  
+-It retrieves the products from a backend API based on the provided orderId and allows users to select a product to view more details.  
+State management is handled using React's useState hook:  
+  products: Stores the list of products that belong to the order identified by the orderId. Initially, it’s set to an empty array.  
+-useEffect hook fetches products when the orderId changes. It makes an API call using axios.get() to fetch the products related to the orderId. If the request is successful, it updates the products state with the fetched data. If there’s an error fetching the products, it logs the error in the console.  
+-handleProductClick function is triggered when a user clicks the "View Details" button for a product. This function calls the onProductSelect prop, passing the selected products ID. The parent component can use this to handle the product selection.  
+-Rendering the products list renders a list of products inside a ListGroup. Each item in the list displays the product's name and a "View Details" button.  
+The button, when clicked, triggers the handleProductClick function, passing the product's ID for further processing.  
+### App.jsx  
+-State management uses this.state to store:  
+  selectedCustomerId: The ID of the currently selected customer.  
+  selectedOrderId: The ID of the currently selected order.  
+  selectedProductId: The ID of the currently selected product.  
+-These states track user selections, which influence what data is displayed or available for interaction.  
+-Event handler methods:  
+  handleCustomerSelect(customerId): Sets the selectedCustomerId when a customer is selected from the CustomerList.  
+  handleOrderSelect(orderId): Sets the selectedOrderId when an order is selected from the OrderForm or ProductList.  
+  handleProductSelect(productId): Sets the selectedProductId when a product is selected from the ProductList.  
+  handleProductSaved(): Logs a message when a product is saved, typically used to refresh the product list or notify the user.  
+-Conditional rendering depends on the current state. If a selectedCustomerId exists, the OrderForm is displayed for the selected customer.  
+If a selectedOrderId exists, the ProductList is rendered, showing products associated with that order.  
+-The OrderHistory is displayed for the selected customer.
+-If a selectedProductId exists, the ProductDetails component is rendered, showing details of the selected product.
+-The app uses React Router to handle navigation between different pages. The routes define paths for displaying CustomerList, CustomerForm, ProductForm , and ProductDetails.  
+-The element prop in the Route component defines which component should be rendered when the corresponding route is matched.
+-The NavigationBar component is displayed at the top of the app and provides links for users to navigate between pages.  
+
+
+
 
 
