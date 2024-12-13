@@ -114,8 +114,7 @@ const OrderForm = ({ onSubmit }) => {
 };
 
 OrderForm.propTypes = {
-    onSubmit: PropTypes.func
-  };
-  
+  onSubmit: PropTypes.func,
+};
 
 export default OrderForm;

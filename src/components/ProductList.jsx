@@ -2,9 +2,12 @@ import { useEffect, useState } from 'react';
 import { ListGroup, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import axios from 'axios';
+import OrderForm from './OrderForm';  
 
-const ProductList = ({ orderId, onProductSelect }) => {
+const ProductList = ({ orderId }) => {
   const [products, setProducts] = useState([]);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const [showOrderForm, setShowOrderForm] = useState(false);
 
   useEffect(() => {
     if (orderId) {
@@ -20,7 +23,12 @@ const ProductList = ({ orderId, onProductSelect }) => {
   }, [orderId]);
 
   const handleProductClick = (productId) => {
-    onProductSelect(productId);
+    setSelectedProductId(productId);
+    setShowOrderForm(true);
+  };
+
+  const handleOrderSubmit = () => {
+    setShowOrderForm(false);
   };
 
   return (
@@ -36,6 +44,13 @@ const ProductList = ({ orderId, onProductSelect }) => {
           </ListGroup.Item>
         ))}
       </ListGroup>
+
+      {showOrderForm && selectedProductId && (
+        <OrderForm
+          selectedProductId={selectedProductId}
+          onSubmit={handleOrderSubmit}
+        />
+      )}
     </div>
   );
 };
@@ -46,4 +61,5 @@ ProductList.propTypes = {
 };
 
 export default ProductList;
+
 
