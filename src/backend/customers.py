@@ -12,7 +12,7 @@ class Customer(db.Model):
     name = db.Column(db.String(100))
     email = db.Column(db.String(100))
     address = db.Column(db.String(200))
-
+#Not sure if i actually need this here since i have a product.py file in the backend folder but i kept it incase
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
