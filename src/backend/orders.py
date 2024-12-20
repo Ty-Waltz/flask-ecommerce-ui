@@ -1,26 +1,50 @@
 from flask import Flask, jsonify, request
+from flask_sqlalchemy import SQLAlchemy
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password_here@localhost:3306/Ecommerce_UI'
+db = SQLAlchemy(app)
 
-orders = [
-    { "id": 1, "customer_id": 1, "total": 100.50, "status": "Completed" },
-    { "id": 2, "customer_id": 2, "total": 250.00, "status": "Pending" }
-]
+class Order(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, nullable=False)
+    total = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(50), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "customer_id": self.customer_id,
+            "total": self.total,
+            "status": self.status
+        }
+
 
 @app.route('/orders', methods=['GET'])
 def get_orders():
-    return jsonify(orders)
+    orders = Order.query.all()
+    return jsonify([order.to_dict() for order in orders])
+
 
 @app.route('/orders/<int:order_id>', methods=['GET'])
 def get_order(order_id):
-    order = next((o for o in orders if o["id"] == order_id), None)
+    order = Order.query.get(order_id)
     if order is None:
         return jsonify({"error": "Order not found"}), 404
-    return jsonify(order)
+    return jsonify(order.to_dict())
+
 
 @app.route('/orders', methods=['POST'])
 def create_order():
-    new_order = request.json
-    new_order["id"] = len(orders) + 1
-    orders.append(new_order)
-    return jsonify(new_order), 201
+    data = request.json
+    new_order = Order(
+        customer_id=data["customer_id"],
+        total=data["total"],
+        status=data["status"]
+    )
+    db.session.add(new_order)
+    db.session.commit()
+    return jsonify(new_order.to_dict()), 201
+

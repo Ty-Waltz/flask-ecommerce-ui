@@ -8,6 +8,10 @@ import ProductDetails from "./components/ProductDetails";
 import CustomerForm from './components/CustomerForm';
 import NavigationBar from "./components/NavigationBar";
 import OrderHistory from "./components/OrderHistory";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./components/Login";
+import Logout from "./components/Logout";
+import SignUp from "./components/SignUp"; 
 import './AppStyles.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -37,6 +41,21 @@ class App extends Component {
     console.log("Product saved, refresh product list");
   };
 
+  handleSignUp = () => {
+    this.setState({ isLoggedIn: false });
+  };
+
+  handleLogin = (token) => {
+    localStorage.setItem("authToken", token)
+    this.setState({ isAuthenticated: true });
+  };
+
+  handleLogout = () => {
+    localStorage.removeItem("authToken");
+    this.setState({ isAuthenticated: false });
+  };
+
+
   render() {
     const { selectedCustomerId, selectedOrderId, selectedProductId } = this.state;
 
@@ -50,6 +69,11 @@ class App extends Component {
           <Route path="/customers" element={<CustomerList onCustomerSelect={this.handleCustomerSelect} />} />
           <Route path="/add-products" element={<ProductForm onProductSaved={this.handleProductSaved} />} />
           <Route path="/edit-product/:id" element={<ProductForm onProductSaved={this.handleProductSaved} />} />
+          <Route path="/products" element={<ProductList/>} />
+          <Route path="/signup" element={<SignUp onSignUp={this.handleSignUp} />} />
+          <Route path="/login" element={<Login onLogin={this.handleLogin} />} />
+          <Route path="/logout" element={<Logout  onLogout={this.handleLogout}/>} />
+          <Route path="/products" element={<ProtectedRoute><ProductList /></ProtectedRoute>} />
         </Routes>
 
         <h1>Our Customers</h1>
